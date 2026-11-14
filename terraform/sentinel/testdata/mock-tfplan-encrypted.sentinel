@@ -1,0 +1,19 @@
+terraform_version = "1.17.1"
+
+resource_changes = {
+    "aws_instance.web_server": {
+        "address": "aws_instance.web_server",
+        "mode": "managed",
+        "type": "aws_instance",
+        "change": {
+            "actions": ["create"],
+            "after": {
+                "root_block_device": [
+                    {
+                        "encrypted": true,
+                    },
+                ],
+            },
+        },
+    },
+}

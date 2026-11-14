@@ -1,0 +1,17 @@
+import "tfconfig/v2" as tfconfig
+
+# Approved AWS regions.
+approved_regions = ["eu-west-1"]
+
+# Find AWS provider configurations.
+aws_providers = filter tfconfig.providers as _, provider {
+	provider.name is "aws"
+}
+
+# Require at least one AWS provider in an approved region.
+main = rule {
+	length(aws_providers) > 0 and
+	all aws_providers as _, provider {
+		provider.config.region.constant_value in approved_regions
+	}
+}
