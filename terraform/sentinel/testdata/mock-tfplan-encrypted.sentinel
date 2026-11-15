@@ -13,6 +13,11 @@ resource_changes = {
                         "encrypted": true,
                     },
                 ],
+                "metadata_options": [
+                    {
+                        "http_tokens": "required",
+                    },
+                ],
             },
         },
     },

@@ -1,17 +1,23 @@
 import "tfplan/v2" as tfplan
 
 aws_instances = filter tfplan.resource_changes as _, resource {
-	resource.mode is "managed" and
-		resource.type is "aws_instance" and
-		resource.change.actions is not ["delete"]
+    resource.mode is "managed" and
+    resource.type is "aws_instance" and
+    resource.change.actions is not ["delete"]
 }
 
 main = rule {
-	length(aws_instances) > 0 and
-	all aws_instances as _, instance {
-		length(instance.change.after.root_block_device) > 0 and
-			all instance.change.after.root_block_device as _, volume {
-				volume.encrypted is true
-			}
-	}
+    length(aws_instances) > 0 and
+
+    all aws_instances as _, instance {
+        # Require encrypted root EBS volumes.
+        length(instance.change.after.root_block_device) > 0 and
+        all instance.change.after.root_block_device as _, volume {
+            volume.encrypted is true
+        } and
+
+        # Require IMDSv2.
+        length(instance.change.after.metadata_options) > 0 and
+        instance.change.after.metadata_options[0].http_tokens is "required"
+    }
 }
