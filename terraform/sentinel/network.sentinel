@@ -1,0 +1,19 @@
+import "tfplan/v2" as tfplan
+
+security_groups = filter tfplan.resource_changes as _, resource {
+	resource.mode is "managed" and
+		resource.type is "aws_security_group" and
+		resource.change.actions is not ["delete"]
+}
+
+main = rule {
+	length(security_groups) > 0 and
+	all security_groups as _, sg {
+		all sg.change.after.ingress as _, ingress_rule {
+			not (ingress_rule.protocol is "-1" and ingress_rule.cidr_blocks contains "0.0.0.0/0") and
+				not (ingress_rule.protocol is "-1" and ingress_rule.ipv6_cidr_blocks contains "::/0") and
+				not (ingress_rule.protocol is "tcp" and ingress_rule.from_port <= 22 and ingress_rule.to_port >= 22 and ingress_rule.cidr_blocks contains "0.0.0.0/0") and
+				not (ingress_rule.protocol is "tcp" and ingress_rule.from_port <= 22 and ingress_rule.to_port >= 22 and ingress_rule.ipv6_cidr_blocks contains "::/0")
+		}
+	}
+}
