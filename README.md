@@ -168,3 +168,33 @@ I also ran the Sentinel tests locally to check that the policies behaved as expe
 All five policy test suites passed.
 
 I also saved the Terraform plan output and generated plan files in the repository. No Apply operation was performed during these tests.
+
+## 8. Plan-Time Limitations & Maintenance Challenges
+
+Sentinel provides a useful way to check infrastructure changes before they are applied. However, there are some limitations that need to be considered when using it in a real environment.
+
+1. **No automatic drift prevention:** Sentinel evaluates Terraform runs, but it does not prevent someone from making changes directly through the AWS Console or other tools. Additional monitoring, such as AWS Config, would be needed to detect these changes.
+
+2. **Keeping policies up to date:** AWS and its Terraform provider change over time. New resources and attributes may require updates to existing policies. The policies should therefore be reviewed and tested whenever the provider version is upgraded.
+
+3. **Policy exceptions:** Some rules may need to be adjusted as infrastructure requirements change. For example, restricting EC2 instances to only two types might not suit every workload. A clear approval process would help manage exceptions without weakening security controls.
+
+4. **Limitations of plan-time checks:** Sentinel evaluates the configuration and planned changes available during a Terraform run. It cannot guarantee that the infrastructure will remain compliant after deployment or inspect every aspect of the cloud provider's internal operations.
+
+For a production environment, I would complement Sentinel with AWS Config for continuous compliance monitoring, customer-managed KMS keys for stronger encryption control, and AWS Service Control Policies (SCPs) to enforce additional restrictions at the account level.
+
+These measures would help cover some of the gaps that cannot be addressed by Sentinel alone.
+
+## 9. AI Tool Disclosure
+
+OpenAI ChatGPT (GPT-6) was used as a support tool during the development of this project.
+
+As I had never worked with HashiCorp Sentinel before, I used ChatGPT to get a general introduction to the tool, understand how its policies work, how to structure them and how to run tests using mock data.
+
+During development, I also used it whenever I ran into problems or needed clarification. For example, when a Sentinel test was failing, when I had difficulties with policy syntax or when an evaluation did not behave as expected. I also used it to better understand parts of the Terraform and Sentinel documentation and some of HashiCorp's concepts and features.
+
+**Example prompt used:**
+
+> "Why is my HashiCorp Sentinel test failing with a mock tfplan file when checking root_block_device encryption on an aws_instance, and how should I structure the rule?"
+
+Overall, I used it as a learning and troubleshooting resource. I independently designed the repository structure, wrote and adjusted the Terraform and Sentinel configurations, configured the GitHub and HCP Terraform integration, and carried out all compliant and non-compliant test evaluations.
