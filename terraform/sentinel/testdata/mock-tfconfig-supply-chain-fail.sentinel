@@ -1,0 +1,11 @@
+providers = {
+    "aws": {
+        "provider_config_key": "aws",
+        "name": "aws",
+        "full_name": "registry.terraform.io/example/aws",
+        "version_constraint": "~> 5.0",
+        "config": {},
+    },
+}
+
+module_calls = {}

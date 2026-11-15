@@ -1,0 +1,23 @@
+import "tfconfig/v2" as tfconfig
+
+# Approved provider sources and version constraints.
+approved_provider_sources = [
+	"registry.terraform.io/hashicorp/aws",
+]
+
+approved_provider_versions = ["~> 5.0"]
+
+# Approved modules: exact source@version combinations.
+# Add entries here when a module has been reviewed.
+approved_modules = []
+
+main = rule {
+	length(tfconfig.providers) > 0 and
+	all tfconfig.providers as _, provider {
+		provider.full_name in approved_provider_sources and
+			provider.version_constraint in approved_provider_versions
+	} and
+	all tfconfig.module_calls as _, module {
+		(module.source + "@" + module.version_constraint) in approved_modules
+	}
+}
